@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+require("babel-polyfill");
+
+import { Category } from '../models';
+
+const charity = [
+    'Children',
+    'Health',
+    'Women',
+    'Food',
+    'Social Help.',
+    'Animals & Pets',
+    'Accidents & Emergencies'
+];
+
+const crowd = [
+    'Accidents & Emergencies',
+    'Animals & Pets',
+    'Babies, Kids & Family',
+    'Business & Entrepreneurs',
+    'Celebrations & Events',
+    'Community & Neighbors',
+    'Competitions & Pageants',
+    'Creative Arts, Music & Film',
+    'Dreams, Hopes & Wishes',
+    'Education & Learning',
+    'Funerals & Memorials',
+    'Medical, Illness & Healing',
+    'Missions, Faith & Church',
+    'Non-Profits & Charities',
+    'Sports, Teams & Clubs',
+    'Travel & Adventure',
+    'Volunteer & Service',
+    'Weddings & Honeymoons',
+    'Other'
+];
+
+const categoriesByType = { charity, crowd };
+
+(async () => {
+    console.log('Categories sync - Start');
+
+    try {
+        for (const type in categoriesByType) {
+            for (const name of categoriesByType[type]) {
+                const prop = `is_${type}`;
+                const [ category, isNew ] = await Category.findOrCreate({ where: { name }, defaults: { [prop]: true } });
+
+                if (!isNew) {
+                    category[prop] = true;
+                    await category.save();
+                }
+            }
+        }
+    }
+    catch (error) {
+        console.warn(error);
+    }
+
+    console.log('Categories sync - Done');
+})();

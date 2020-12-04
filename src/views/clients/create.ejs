@@ -1,0 +1,37 @@
+<%- contentFor('body') %>
+
+<div class="container create-client">
+    <div class="row">
+        <div class="col-12">
+            <h1>Client Add</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                <div class="form-group">
+                    <% let nameIsValid = true %>
+                    <%for (let message of data.messages){%>
+                        <%if (message.path === 'name'){%>
+                            <% nameIsValid = false %>
+                        <%}%>
+                    <%}%>
+                    <label>Name</label>
+                    <input type="text" name="name" value="<%= data.prev.name ? data.prev.name : '' %>" class="form-control <%= !nameIsValid ? 'is-invalid' : '' %>" required>
+                    <%for (let message of data.messages){%>
+                        <%if (message.path === 'name'){%>
+                            <div class="invalid-feedback">
+                                <%=message.message%>
+                            </div>
+                        <%}%>
+                    <%}%>
+                </div>
+                <div class="form-group">
+                    <label>Redirect Uri</label>
+                    <input type="text" name="redirect_uri"  value="<%= data.prev.redirect_uri ? data.prev.redirect_uri : '' %>" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

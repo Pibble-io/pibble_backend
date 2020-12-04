@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+require("babel-polyfill");
+
+const crypto = require('crypto');
+
+import { Wallet, sequelize } from '../models';
+
+const encryptWalletPrivateKey = async () => {
+    const wallets = await Wallet.all({raw: true});
+    wallets.map(item => {
+        if (item.private_key) {
+            const cipher = crypto.createCipher('aes192', process.env.CRYPTO_PASSWORD);
+            let encrypted = cipher.update(item.private_key, 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            sequelize.query(`UPDATE wallets SET private_key = "${encrypted}" WHERE address = "${item.address}"`);
+        }
+    });
+};
+
+encryptWalletPrivateKey().then(() => {
+    console.log('Wallet Encryption is done');
+});

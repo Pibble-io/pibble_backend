@@ -1,0 +1,61 @@
+const levels = [
+    { id: 1, name: 'bronze_10', humanly: 'Bronze 10', description: null, points_earn: 0 },
+    { id: 2, name: 'bronze_9', humanly: 'Bronze 9', description: null, points_earn: 5 },
+    { id: 3, name: 'bronze_8', humanly: 'Bronze 8', description: null, points_earn: 10 },
+    { id: 4, name: 'bronze_7', humanly: 'Bronze 7', description: null, points_earn: 21 },
+    { id: 5, name: 'bronze_6', humanly: 'Bronze 6', description: null, points_earn: 35 },
+    { id: 6, name: 'bronze_5', humanly: 'Bronze 5', description: null, points_earn: 56 },
+    { id: 7, name: 'bronze_4', humanly: 'Bronze 4', description: null, points_earn: 85 },
+    { id: 8, name: 'bronze_3', humanly: 'Bronze 3', description: null, points_earn: 126 },
+    { id: 9, name: 'bronze_2', humanly: 'Bronze 2', description: null, points_earn: 183 },
+    { id: 10, name: 'bronze_1', humanly: 'Bronze 1', description: null, points_earn: 262 },
+    { id: 11, name: 'silver_10', humanly: 'Silver 10', description: null, points_earn: 371 },
+    { id: 12, name: 'silver_9', humanly: 'Silver 9', description: null, points_earn: 519 },
+    { id: 13, name: 'silver_8', humanly: 'Silver 8', description: null, points_earn: 720 },
+    { id: 14, name: 'silver_7', humanly: 'Silver 7', description: null, points_earn: 992 },
+    { id: 15, name: 'silver_6', humanly: 'Silver 6', description: null, points_earn: 1359 },
+    { id: 16, name: 'silver_5', humanly: 'Silver 5', description: null, points_earn: 1852 },
+    { id: 17, name: 'silver_4', humanly: 'Silver 4', description: null, points_earn: 2513 },
+    { id: 18, name: 'silver_3', humanly: 'Silver 3', description: null, points_earn: 3397 },
+    { id: 19, name: 'silver_2', humanly: 'Silver 2', description: null, points_earn: 4575 },
+    { id: 20, name: 'silver_1', humanly: 'Silver 1', description: null, points_earn: 6143 },
+    { id: 21, name: 'gold_10', humanly: 'Gold 10', description: null, points_earn: 8225 },
+    { id: 22, name: 'gold_9', humanly: 'Gold 9', description: null, points_earn: 10985 },
+    { id: 23, name: 'gold_8', humanly: 'Gold 8', description: null, points_earn: 14639 },
+    { id: 24, name: 'gold_7', humanly: 'Gold 7', description: null, points_earn: 19468 },
+    { id: 25, name: 'gold_6', humanly: 'Gold 6', description: null, points_earn: 25840 },
+    { id: 26, name: 'gold_5', humanly: 'Gold 5', description: null, points_earn: 34238 },
+    { id: 27, name: 'gold_4', humanly: 'Gold 4', description: null, points_earn: 45294 },
+    { id: 28, name: 'gold_3', humanly: 'Gold 3', description: null, points_earn: 59831 },
+    { id: 29, name: 'gold_2', humanly: 'Gold 2', description: null, points_earn: 78925 },
+    { id: 30, name: 'gold_1', humanly: 'Gold 1', description: null, points_earn: 103979 },
+    { id: 31, name: 'platinum_10', humanly: 'Platinum 10', description: null, points_earn: 136824 },
+    { id: 32, name: 'platinum_9', humanly: 'Platinum 9', description: null, points_earn: 179845 },
+    { id: 33, name: 'platinum_8', humanly: 'Platinum 8', description: null, points_earn: 236146 },
+    { id: 34, name: 'platinum_7', humanly: 'Platinum 7', description: null, points_earn: 309769 },
+    { id: 35, name: 'platinum_6', humanly: 'Platinum 6', description: null, points_earn: 405972 },
+    { id: 36, name: 'platinum_5', humanly: 'Platinum 5', description: null, points_earn: 531593 },
+    { id: 37, name: 'platinum_4', humanly: 'Platinum 4', description: null, points_earn: 695517 },
+    { id: 38, name: 'platinum_3', humanly: 'Platinum 3', description: null, points_earn: 909286 },
+    { id: 39, name: 'platinum_2', humanly: 'Platinum 2', description: null, points_earn: 1187890 },
+    { id: 40, name: 'platinum_1', humanly: 'Platinum 1', description: null, points_earn: 1550783 },
+    { id: 41, name: 'diamond_10', humanly: 'Diamond 10', description: null, points_earn: 2023207 },
+    { id: 42, name: 'diamond_9', humanly: 'Diamond 9', description: null, points_earn: 2637898 },
+    { id: 43, name: 'diamond_8', humanly: 'Diamond 8', description: null, points_earn: 3437298 },
+    { id: 44, name: 'diamond_7', humanly: 'Diamond 7', description: null, points_earn: 4476414 },
+    { id: 45, name: 'diamond_6', humanly: 'Diamond 6', description: null, points_earn: 5826507 },
+    { id: 46, name: 'diamond_5', humanly: 'Diamond 5', description: null, points_earn: 7579873 },
+    { id: 47, name: 'diamond_4', humanly: 'Diamond 4', description: null, points_earn: 9856008 },
+    { id: 48, name: 'diamond_3', humanly: 'Diamond 3', description: null, points_earn: 12809580 },
+    { id: 49, name: 'diamond_2', humanly: 'Diamond 2', description: null, points_earn: 16640720 },
+    { id: 50, name: 'diamond_1', humanly: 'Diamond 1', description: null, points_earn: 21608308 }
+];
+
+
+module.exports = {
+    up: (queryInterface, Sequelize) => queryInterface.bulkInsert('levels', levels, {
+        updateOnDuplicate: ['name', 'humanly', 'description', 'points_earn']
+    }),
+
+    down: (queryInterface, Sequelize) => {}
+};

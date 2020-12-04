@@ -1,0 +1,41 @@
+<%- contentFor('body') %>
+
+<div class="clients">
+    <div class="row">
+        <div class="col-8">
+            <h1>Client List</h1>
+        </div>
+        <div class="col-4 text-right">
+            <a class="btn btn-success" href="/oauth2/clients/create" role="button">
+                Add
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Client Id</th>
+                    <th scope="col">Client Secret</th>
+                    <th scope="col">Redirect Uri</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% data = JSON.parse(data)%>
+                <%for (let key in data.items){%>
+                    <tr>
+                        <th scope="row"><%=parseInt(key)+1%></th>
+                        <td><%=data.items[key]['name']%></td>
+                        <td><%=data.items[key]['client_id']%></td>
+                        <td><%=data.items[key]['client_secret']%></td>
+                        <td><%=data.items[key]['redirect_uri']%></td>
+                    </tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

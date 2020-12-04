@@ -1,0 +1,48 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+        <form method="post">
+            <div class="panel">
+                <div class="panel__header">
+                    Verify Your Mobile phone :
+                    <br>
+                    +<%=data.prev.phone%>
+                </div>
+                <div class="panel__body">
+                    <p class="panel__title ">
+                        Please enter the verification code we send to via SMS
+                    </p>
+                    <div class="code text-center">
+                        <div class="input">
+                            <input type="text" maxlength="1" name="code[1]" class="input__input" required>
+                        </div>
+                        <div class="input">
+                            <input type="text" maxlength="1" name="code[2]" class="input__input" required>
+                        </div>
+                        <div class="input">
+                            <input type="text" maxlength="1" name="code[3]" class="input__input" required>
+                        </div>
+                        <div class="input">
+                            <input type="text" maxlength="1" name="code[4]" class="input__input" required>
+                        </div>
+                    </div>
+                    <br>
+                    <p>
+                        Didn't receive the SMS?
+                        <br>
+                        Resend the SMS after 30 sec.
+                    </p>
+                    <p class="text-center">
+                        <a href="#" class="underline">Resend</a>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-main btn-block">Continue</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

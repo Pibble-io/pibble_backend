@@ -1,0 +1,47 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+        <form method="post">
+            <div class="panel">
+                <div class="panel__header">
+                    Register your mobile phone
+                </div>
+                <div class="panel__body">
+                    <p class="panel__title">
+                        Please enter the verification code we e-mailed to.
+                    </p>
+                    <div class="input">
+                        <label class="input__label">Mobile phone number</label>
+                        <div class="form-row">
+                            <div class="col-4">
+                                <select name="phone[country_id]" class="input__input" required>
+                                    <%for (let country of data.countries){%>
+                                        <option value="<%=country.id%>"><%=country.iso%> +<%=country.phonecode%></option>
+                                    <%}%>                                    
+                                </select>
+                                <!-- <input type="text" name="code" class="input__input" required> -->
+                            </div>
+                            <div class="col-8">
+                                <input type="text" name="phone[number]" class="input__input" required>
+                            </div>
+                        </div>
+                        <%for (let message of data.messages){%>
+                            <%if (message.path === 'phone'){%>
+                                <p class="input__error"><%=message.message%></p>
+                            <%}%>
+                        <%}%>
+                    </div>
+                    <p>
+                        The mobile phone will only be used if you wish to Two-Factor Authentication or receive a system SMS.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-main btn-block">Continue</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

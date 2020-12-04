@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+
+require("babel-polyfill");
+
+import path from 'path';
+import fs from 'fs';
+import { Media } from '../models';
+import { s3DownloadFile, s3UploadFile, s3UploadTempFile } from "../utils/aws";
+import { getImageThumbnail, getVideoThumbnail, getVideoCodecInfo, getVideoPoster } from '../helpers/media';
+
+Media.all({ where: { type: 'post' } }).then(async media => {
+    try {
+        for (const mediaItem of media) {
+            const pathInfo = path.parse(mediaItem.s3Key);
+            const thumbnailFilename = `${ pathInfo.name }.jpg`;
+            const s3Key_thumbnail = `${ pathInfo.dir }-thumbnails/${ thumbnailFilename }`;
+            const s3Key_poster = mediaItem.mimetype.includes('video') ? `${ pathInfo.dir }-posters/${ thumbnailFilename }` : '';
+            const thumbnailPath = `uploads/${ thumbnailFilename }`;
+            const thumbnailPathPoster = `uploads/poster-${ thumbnailFilename }`;
+            const mediaPath = await s3DownloadFile(mediaItem.s3Key);
+
+            if (mediaItem.mimetype.includes('video')) {
+                const { duration } = await getVideoCodecInfo(mediaPath);
+                await getVideoThumbnail(mediaPath, thumbnailPath, duration / 2);
+                await getVideoPoster(mediaPath, thumbnailPathPoster, duration / 2);
+            }
+            else {
+                await getImageThumbnail(mediaPath, thumbnailPath);
+            }
+            if (mediaItem.processed) {
+                await s3UploadFile(s3Key_poster, fs.readFileSync(thumbnailPathPoster));
+                await s3UploadFile(s3Key_thumbnail, fs.readFileSync(thumbnailPath));
+            }
+            else {
+                await s3UploadFile(s3Key_poster, fs.readFileSync(thumbnailPathPoster));
+                await s3UploadFile(s3Key_thumbnail, fs.readFileSync(thumbnailPath));
+            }
+
+            fs.unlinkSync(thumbnailPathPoster);
+            fs.unlinkSync(thumbnailPath);
+            fs.unlinkSync(mediaPath);
+            await mediaItem.update({ s3Key_thumbnail, s3Key_poster });
+        }
+        console.log('Done');
+    }
+    catch ( error ) {
+        console.warn(error);
+    }
+});

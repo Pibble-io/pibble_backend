@@ -1,0 +1,9 @@
+{
+  "apps" : [{
+    "script"    : "./dist/bin/www",
+    "cwd": "/var/www/pibble_backend",
+    "instances" : "max",
+    "exec_mode" : "cluster",
+    "env": {"PORT" : "4001"}
+  }]
+}

@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+require('babel-polyfill');
+
+import { User, Balance, Coin, Wallet, sequelize } from '../models';
+
+import bitcoin from '../bitcoin';
+import web3 from '../ethereum';
+import caver from '../klaytn';
+
+const createBtcCoin = async () => {
+    await Coin.findOrCreate({
+        where: { symbol: 'BTC' },
+        defaults: { name: 'Bitcoin', symbol: 'BTC', public_status: false }
+    });
+};
+
+const createBalancesAndWallets = async () => {
+    const users = await User.findAll({ where: {
+        deleted_at: {
+            [sequelize.Op.eq]: null
+        }
+    }});
+    const coins = await Coin.findAll({order: ['id']});
+    for (const { id: user_id } of users) {
+        for (const { id: coin_id, public_status, symbol } of coins) {
+            try {
+                await Balance.findOrCreate({ where: { user_id, coin_id }, defaults: { value: 0 } });
+                if (!public_status) {
+                    const isExists = await Wallet.count({ where: { user_id, coin_id } });
+                    if (!isExists) {
+                        switch (coin_id) {
+                            case 1: // Ethereum
+                                const ethAccount = web3.eth.accounts.create();
+                                await Wallet.create({
+                                    address: ethAccount.address,
+                                    private_key: ethAccount.privateKey,
+                                    user_id,
+                                    coin_id
+                                });
+                                break;
+                            case 2: // Pibble
+                                const eth_coin_id = coins.find(c => c.symbol === 'ETH').id;
+                                let wallet = await Wallet.find({
+                                    where: {
+                                        user_id,
+                                        coin_id: eth_coin_id
+                                    }
+                                });
+
+                                if (!wallet) {
+                                    const ethAccount = web3.eth.accounts.create();
+                                    wallet = await Wallet.create({
+                                        address: ethAccount.address,
+                                        private_key: ethAccount.privateKey,
+                                        user_id,
+                                        coin_id: eth_coin_id
+                                    });
+                                }
+
+                                await Wallet.create({
+                                    address: wallet.address,
+                                    private_key: wallet.private_key,
+                                    user_id,
+                                    coin_id
+                                });
+
+                                break;
+
+                            case 5: // Bitcoin
+                                const address = await bitcoin.getNewAddress();
+                                await Wallet.create({
+                                    address,
+                                    user_id,
+                                    coin_id
+                                });
+
+                                break;
+                            case 6: // Klaytn
+                                const kalyAddress = caver.klay.accounts.create();
+                                await Wallet.create({
+                                    address: kalyAddress.address,
+                                    private_key: kalyAddress.privateKey,
+                                    user_id,
+                                    coin_id
+                                });
+                                break;
+                            case 7: // Pibble KRC20
+                                const klayCoinId = coins.find(c => c.symbol === 'KLAY').id;
+                                let klayWallet = await Wallet.find({
+                                    where: {
+                                        user_id,
+                                        coin_id: klayCoinId
+                                    }
+                                });
+
+                                await Wallet.create({
+                                    address: klayWallet.address,
+                                    private_key: klayWallet.private_key,
+                                    user_id,
+                                    coin_id
+                                });
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                console.warn(error);
+            }
+        }
+    }
+};
+
+createBtcCoin().then(() => {
+    createBalancesAndWallets().then(() => {
+        console.log('Done');
+    });
+});

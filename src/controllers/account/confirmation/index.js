@@ -1,0 +1,1 @@
+export {confirmationController} from './ConfirmationController';

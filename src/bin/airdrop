@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+
+require("babel-polyfill");
+
+const csv = require('csv-parser');
+const fs = require('fs');
+const PIB_COIN_ID = 2;
+
+const failedRecords = [];
+const results = [];
+
+import {
+    Wallet,
+    Balance,
+    Airdrop,
+    sequelize
+} from '../models';
+
+let successCount = 0;
+
+const airdrop = async () => {
+    fs.createReadStream('data/airdrop_20190522.csv')
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', async () => {
+            for (let item of results) {
+
+                let wallet = await Wallet.findOne({
+                    where: {
+                        coin_id: PIB_COIN_ID,
+                        address: item.address
+                    }
+                });
+
+                let value = parseFloat(item.value);
+
+                if (wallet && value > 0) {
+                    let balance = await Balance.findOne({
+                        where: {
+                            user_id: wallet.user_id,
+                            coin_id: PIB_COIN_ID
+                        }
+                    });
+
+                    let tx;
+                    try {
+                        tx = await sequelize.transaction();
+
+                        let airdropTransaction = await Airdrop.create({
+                            value: value,
+                            user_id: wallet.user_id,
+                            coin_id: PIB_COIN_ID,
+                        }, {
+                            transaction: tx
+                        });
+
+                        balance.value = parseFloat(balance.value) + value;
+                        await balance.save({
+                            transaction: tx
+                        });
+
+                        await tx.commit();
+
+                        console.log(`Success: address:${item.address} , value: ${item.value}`);
+                        successCount++;
+
+                    } catch (error) {
+                        console.log(error);
+                        await tx.rollback();
+                    }
+                } else {
+                    failedRecords.push(item);
+                }
+            }
+            console.log(`${successCount} of ${results.length} airdrop was successful`);
+            console.log('failed data:', failedRecords);
+        });
+};
+
+airdrop().then(() => {
+    console.log('Airdrop is done');
+});

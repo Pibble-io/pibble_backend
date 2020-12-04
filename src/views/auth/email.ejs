@@ -1,0 +1,40 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+        <form method="post">
+            <div class="panel">
+                <div class="panel__header">
+                    Join with email address
+                </div>
+                <div class="panel__body">
+                    <div class="input">
+                        <label class="input__label">Email address</label>
+                        <input type="email" name="email" class="input__input" required>
+                        
+                        <%for (let message of data.messages){%>
+                            <%if (message.path === 'email'){%>
+                                <p class="input__error"><%=message.message%></p>
+                            <%}%>
+                        <%}%>
+                    </div>
+                    <p>
+                        The email address is a log-in identity. It should be a valid e-mail address. It will only be used if you wish to receive a new password or receive a system notifications.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-main btn-block">Continue</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+

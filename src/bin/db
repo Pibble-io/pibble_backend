@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+require("babel-polyfill");
+const fs = require('fs');
+const path = require('path');
+const models = require('../models');
+
+import { s3UploadIfNotExists } from "../utils/aws";
+
+const uploadMediaFiles = async (folder, s3KeyPrefix) => Promise.all(fs
+    .readdirSync(folder)
+    .map(file => s3UploadIfNotExists(s3KeyPrefix + '/' + file, fs.readFileSync(path.join(folder, file)))));
+
+models
+    .sequelize
+    .query('SET FOREIGN_KEY_CHECKS = 0', { raw: true })
+    .then(async () => models.sequelize.sync({ force: true }))
+    .then(async () => {
+
+        const sqlSeedsPath = './src/seeders/sql';
+        await Promise.all(fs
+            .readdirSync(sqlSeedsPath)
+            .map(file => {
+                const sql = fs.readFileSync(path.join(sqlSeedsPath, file), "UTF-8");
+                return models.sequelize.query(sql);
+            }));
+
+        console.log('SUCCESS: Sync and seed completed.');
+    })
+    .then(async () => {
+
+        if (!process.env.DEBUG) {
+            return true;
+        }
+
+        await uploadMediaFiles('./src/seeders/media_files/post-media', 'post-media');
+        await uploadMediaFiles('./src/seeders/media_files/avatars', 'avatars');
+
+        const sqlSeedsPath = './src/seeders/debug';
+        const files = fs.readdirSync(sqlSeedsPath);
+
+        for (const file of files) {
+            const sql = fs.readFileSync(path.join(sqlSeedsPath, file), "UTF-8");
+            await models.sequelize.query(sql);
+        }
+
+        console.log('SUCCESS: Debug sync and seed completed.');
+    })
+    .then( async () => {
+        process.exit();
+    })
+    .catch((error) => {
+        console.log('ERROR: Sync and seed, aborted.', error);
+        process.exit();
+    });
